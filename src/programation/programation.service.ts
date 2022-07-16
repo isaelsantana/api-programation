@@ -1,22 +1,36 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Programation, ProgramationDocument } from './schemas/programation.schema';
+import { ProgramationView, ProgramationDocument } from './schemas/programation.schema';
 
 @Injectable()
 export class ProgramationService {
-  constructor(@InjectModel(Programation.name) private programationModel: Model<ProgramationDocument>) {}
+  constructor(@InjectModel(ProgramationView.name) private programationModel: Model<ProgramationDocument>) {}
 
-  async findAll(): Promise<Programation[]> {
+  async findAll(): Promise<ProgramationView[]> {
     return this.programationModel.find().sort({ datetime: 1 }).exec();
   }
-  async find(filter: any): Promise<Programation[]> {
+  async find(filter: any): Promise<ProgramationView[]> {
     const query: any = this.getQueryFilter(filter)
     console.log('query' , query)
     return this.programationModel.find(query).sort({ datetime: 1 }).exec();
   }
 
-  async findById(id: string): Promise<Programation> {
+  async findCurrentProgramation(): Promise<ProgramationView[]> {
+    let dateNow = new Date();
+    const query: any = {          
+      'nextProgramation.datetime': {
+        $gt: dateNow
+      },                  
+      datetime: {
+        $lte: dateNow
+      }             
+    }
+    console.log('query' , query)
+    return this.programationModel.find(query).sort({ datetime: 1 }).exec();
+  }
+
+  async findById(id: string): Promise<ProgramationView> {
     return this.programationModel.findById(id).exec();
   }
 

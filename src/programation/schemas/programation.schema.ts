@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
-export type ProgramationDocument = Programation & Document;
+export type ProgramationDocument = ProgramationView & Document;
 
 @Schema()
 class Program {
@@ -18,8 +18,7 @@ class Channel {
     }
 }
 
-@Schema()
-export class Programation {
+class Programation {
     @Prop()
     datetime: Date;
 
@@ -29,7 +28,7 @@ export class Programation {
     @Prop()
     time: string;
 
-    @Prop({ 
+    @Prop({
         default: new Date().toISOString()
     })
     createdAt: Date;
@@ -41,6 +40,13 @@ export class Programation {
     channel: Channel;
 }
 
+@Schema({collection: "next-programation"})
+export class ProgramationView extends Programation {  
+
+    @Prop()
+    nextProgramation: Programation;
+}
 
 
-export const ProgramationSchema = SchemaFactory.createForClass(Programation);
+
+export const ProgramationSchema = SchemaFactory.createForClass(ProgramationView);
